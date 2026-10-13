@@ -1,0 +1,45 @@
+{
+  "openapi": "3.1.1",
+  "info": {"title": "Inventory API", "version": "1.0"},
+  "paths": {
+    "/items": {
+      "post": {
+        "parameters": [
+          {"name": "X-Request-ID", "in": "header", "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateItem"}}}
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Item"}}}
+          }
+        }
+      }
+    },
+    "/health": {"get": {"responses": {"204": {"description": "Healthy"}}}}
+  },
+  "components": {
+    "schemas": {
+      "CreateItem": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string", "minLength": 1, "maxLength": 80},
+          "category": {"type": "string", "enum": ["book", "software"]}
+        },
+        "required": ["name"]
+      },
+      "Item": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "status": {"type": "string", "enum": ["draft", "active"]}
+        },
+        "required": ["id", "name", "status"]
+      }
+    }
+  }
+}

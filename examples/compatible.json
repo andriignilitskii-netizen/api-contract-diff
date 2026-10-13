@@ -1,0 +1,46 @@
+{
+  "openapi": "3.1.1",
+  "info": {"title": "Inventory API", "version": "1.1"},
+  "paths": {
+    "/items": {
+      "post": {
+        "parameters": [
+          {"name": "X-Request-ID", "in": "header", "schema": {"type": "string"}},
+          {"name": "dry_run", "in": "query", "schema": {"type": "boolean"}}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateItem"}}}
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Item"}}}
+          }
+        }
+      }
+    },
+    "/health": {"get": {"responses": {"204": {"description": "Healthy"}}}}
+  },
+  "components": {
+    "schemas": {
+      "CreateItem": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string", "minLength": 1, "maxLength": 120},
+          "category": {"type": "string", "enum": ["book", "software", "hardware"]}
+        },
+        "required": ["name"]
+      },
+      "Item": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "status": {"type": "string", "enum": ["active"]}
+        },
+        "required": ["id", "name", "status"]
+      }
+    }
+  }
+}
