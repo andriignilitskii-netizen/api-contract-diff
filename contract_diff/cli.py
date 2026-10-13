@@ -54,6 +54,12 @@ def render(findings: list[Finding], format_name: str) -> str:
     return "\n".join(lines)
 
 
+def exit_code(findings: list[Finding], fail_on: str) -> int:
+    if fail_on not in {"breaking", "review"}:
+        raise InputError("fail-on must be breaking or review")
+    return int(any(f.severity == "breaking" or fail_on == "review" for f in findings))
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Compare OpenAPI 3.1 JSON contracts for compatibility with existing clients.")
     parser.add_argument("old", type=Path)
@@ -67,4 +73,4 @@ def main(argv: list[str] | None = None) -> int:
         print(f"contract-diff: {exc}", file=sys.stderr)
         return 2
     print(render(findings, args.format))
-    return int(any(f.severity == "breaking" or args.fail_on == "review" for f in findings))
+    return exit_code(findings, args.fail_on)

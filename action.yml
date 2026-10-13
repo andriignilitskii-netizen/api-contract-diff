@@ -1,0 +1,41 @@
+name: API contract diff
+description: Compare OpenAPI 3.1 JSON contracts and write a CI report.
+inputs:
+  old:
+    description: Path to the baseline contract in the workflow workspace.
+    required: true
+  new:
+    description: Path to the proposed contract in the workflow workspace.
+    required: true
+  fail-on:
+    description: Failure threshold, breaking or review.
+    required: false
+    default: review
+  report:
+    description: JSON report path, written before the action exits.
+    required: false
+    default: contract-diff-report.json
+outputs:
+  status:
+    description: compatible, breaking, review, or error.
+    value: ${{ steps.compare.outputs.status }}
+  breaking:
+    description: Breaking finding count; empty on input or reporting errors.
+    value: ${{ steps.compare.outputs.breaking }}
+  review:
+    description: Review finding count; empty on input or reporting errors.
+    value: ${{ steps.compare.outputs.review }}
+  exit_code:
+    description: 0 passes the threshold, 1 rejects it, 2 indicates an error.
+    value: ${{ steps.compare.outputs.exit_code }}
+runs:
+  using: composite
+  steps:
+    - id: compare
+      shell: bash
+      env:
+        CONTRACT_DIFF_OLD: ${{ inputs.old }}
+        CONTRACT_DIFF_NEW: ${{ inputs.new }}
+        CONTRACT_DIFF_FAIL_ON: ${{ inputs.fail-on }}
+        CONTRACT_DIFF_REPORT: ${{ inputs.report }}
+      run: python "$GITHUB_ACTION_PATH/.github/action/runner.py"

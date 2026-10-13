@@ -6,6 +6,8 @@ Compare two OpenAPI 3.1 JSON files before changing an API. The CLI reports struc
 
 It runs offline and has no runtime dependencies. Python 3.11+.
 
+Start with [the API-change walkthrough](docs/api-changes.md): a required header, narrower request enums, and nullable response IDs. [GitHub Action usage](docs/github-action.md) covers reports and release gates.
+
 ## Try it
 
 ```sh
@@ -58,6 +60,8 @@ Exit codes:
 
 The default threshold is `breaking`; review findings still appear in the output. Use `--fail-on review` when the report gates a release. Output is deterministic and available as text, JSON, or Markdown.
 
+The repository also contains a [composite GitHub Action](action.yml). Its default threshold is `review`, and it writes a job summary and JSON report before returning a failure. [Inputs, outputs, and workflow example](docs/github-action.md).
+
 ## Boundaries
 
 This is a focused structural check, not a full OpenAPI validator or a proof of compatibility. Validate the contracts before comparing them, then review behavior changes separately.
@@ -80,4 +84,4 @@ This is a focused structural check, not a full OpenAPI validator or a proof of c
 python -m unittest discover -s tests -v
 ```
 
-Tests cover request/response direction, numeric and nullable types, enums, bounds, inherited parameters, reference cycles, escaped pointers, deterministic reports, malformed input, and CLI exit codes. CI runs on Python 3.11, 3.12, and 3.13.
+Tests cover request/response direction, numeric and nullable types, enums, bounds, inherited parameters, reference cycles, escaped pointers, deterministic reports, malformed input, CLI exit codes, and the Actions adapter. CI runs on Python 3.11, 3.12, and 3.13, plus a separate job that exercises the composite action's pass and fail paths.

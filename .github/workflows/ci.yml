@@ -18,3 +18,45 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: python -m unittest discover -s tests -v
       - run: python -m contract_diff examples/baseline.json examples/compatible.json --fail-on review
+
+  action-integration:
+    name: Action integration test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Accept compatible contract
+        id: compatible
+        uses: ./
+        with:
+          old: examples/baseline.json
+          new: examples/compatible.json
+          report: artifacts/compatible.json
+      - name: Reject breaking contract
+        id: breaking
+        continue-on-error: true
+        uses: ./
+        with:
+          old: examples/baseline.json
+          new: examples/breaking.json
+          report: artifacts/breaking.json
+      - name: Verify intentional rejection and saved reports
+        env:
+          BREAKING_OUTCOME: ${{ steps.breaking.outcome }}
+          COMPATIBLE_STATUS: ${{ steps.compatible.outputs.status }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          compatible = json.loads(Path('artifacts/compatible.json').read_text())
+          breaking = json.loads(Path('artifacts/breaking.json').read_text())
+          assert os.environ['COMPATIBLE_STATUS'] == 'compatible'
+          assert compatible['exit_code'] == 0
+          assert os.environ['BREAKING_OUTCOME'] == 'failure'
+          assert breaking['status'] == 'breaking'
+          assert breaking['exit_code'] == 1
+          assert breaking['summary']['breaking'] == 8
+          PY
