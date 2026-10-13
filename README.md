@@ -1,5 +1,7 @@
 # api-contract-diff
 
+[![Tests](https://github.com/andriignilitskii-netizen/api-contract-diff/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/andriignilitskii-netizen/api-contract-diff/actions/workflows/ci.yml)
+
 Compare two OpenAPI 3.1 JSON files before changing an API. The CLI reports structural changes that can break existing clients, with separate `review` findings for rules it cannot decide.
 
 It runs offline and has no runtime dependencies. Python 3.11+.
